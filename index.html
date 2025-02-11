@@ -5,7 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lodemica - Centro de Depilación</title>
 </head>
+    <script>
+    async function cargarTurnos() {
+        const url = "PEGAR_AQUÍ_LA_URL_DEL_SCRIPT"; // Reemplaza con la URL de Google Apps Script
+        const response = await fetch(url);
+        const turnos = await response.json();
+
+        let lista = document.getElementById("lista-turnos");
+        lista.innerHTML = "";
+
+        turnos.forEach(turno => {
+            if (turno.disponible === "Sí") {
+                let item = document.createElement("li");
+                item.textContent = `${turno.dia} ${turno.fecha} - ${turno.hora}`;
+                lista.appendChild(item);
+            }
+        });
+    }
+    cargarTurnos();
+</script>
+
 <body>
+    <h2>Turnos Disponibles</h2>
+<ul id="lista-turnos"></ul>
     <h1>Bienvenido a Lodemica</h1>
     <p>Próximamente podrás reservar turnos online.</p>
 </body>

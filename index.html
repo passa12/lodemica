@@ -3,32 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lodemica - Centro de Depilación</title>
+    <title>Lodemica Turnos</title>
     <script type="module">
-        import { obtenerTurnos } from "./firebaseConfig.js";
+        // Importar Firebase desde un CDN
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyB98r0hWQe5e6l_-kt_uo6UtnJ8qiQPnjU",
+            authDomain: "lodemicaturnos.firebaseapp.com",
+            projectId: "lodemicaturnos",
+            storageBucket: "lodemicaturnos.firebasestorage.app",
+            messagingSenderId: "211971887324",
+            appId: "1:211971887324:web:eb0844c882be45c7b16419"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Obtener los turnos desde Firebase
         async function cargarTurnos() {
-            const turnos = await obtenerTurnos();
-            let lista = document.getElementById("lista-turnos");
-            lista.innerHTML = "";
-
-            turnos.forEach(turno => {
-                if (turno.disponible === "SI") {
-                    let item = document.createElement("li");
-                    item.textContent = `${turno.dia} ${turno.fecha} - ${turno.hora}`;
-                    lista.appendChild(item);
-                }
+            const querySnapshot = await getDocs(collection(db, "turnos"));
+            let turnosHtml = "<h2>Turnos Disponibles</h2>";
+            
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                turnosHtml += `<p>${data.fecha} - ${data.hora} - ${data.dia} - Disponible: ${data.disponible ? "Sí" : "No"}</p>`;
             });
+
+            document.getElementById("turnos").innerHTML = turnosHtml;
         }
 
+        // Llamar a la función para mostrar los turnos
         cargarTurnos();
     </script>
 </head>
 <body>
     <h1>Bienvenido a Lodemica</h1>
     <p>Próximamente reservar turnos online.</p>
-    <h2>Turnos Disponibles</h2>
-    <ul id="lista-turnos"></ul>
+
+    <div id="turnos">
+        <p>Cargando turnos...</p>
+    </div>
 </body>
 </html>
-

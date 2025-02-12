@@ -4,36 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lodemica - Centro de Depilación</title>
+    <script type="module">
+        import { obtenerTurnos } from "./firebaseConfig.js";
+
+        async function cargarTurnos() {
+            const turnos = await obtenerTurnos();
+            let lista = document.getElementById("lista-turnos");
+            lista.innerHTML = "";
+
+            turnos.forEach(turno => {
+                if (turno.disponible === "SI") {
+                    let item = document.createElement("li");
+                    item.textContent = `${turno.dia} ${turno.fecha} - ${turno.hora}`;
+                    lista.appendChild(item);
+                }
+            });
+        }
+
+        cargarTurnos();
+    </script>
 </head>
 <body>
     <h1>Bienvenido a Lodemica</h1>
     <p>Próximamente reservar turnos online.</p>
-    
     <h2>Turnos Disponibles</h2>
     <ul id="lista-turnos"></ul>
-
-    <script>
-        async function cargarTurnos() {
-            const url = "https://script.google.com/macros/s/AKfycbwDzUecA6AH-MHbAzF2mHFftbRgumUGGlGa-IyzCPagNdP0Zaqun_xHe25fRAlpQdC2Dw/exec"; // URL de Google Apps Script
-            try {
-                const response = await fetch(url);
-                const turnos = await response.json();
-
-                let lista = document.getElementById("lista-turnos");
-                lista.innerHTML = "";
-
-                turnos.forEach(turno => {
-                    if (turno.disponible.trim().toLowerCase() === "sí") {
-                        let item = document.createElement("li");
-                        item.textContent = `${turno.dia} ${turno.fecha} - ${turno.hora}`;
-                        lista.appendChild(item);
-                    }
-                });
-            } catch (error) {
-                console.error("Error al cargar los turnos:", error);
-            }
-        }
-        cargarTurnos();
-    </script>
 </body>
 </html>
+

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lo de Mica - Reserva de Turnos</title>
   <style>
-    /* Reset básico */
+    /* Estilos básicos y responsivos */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -22,17 +22,17 @@
     .container {
       width: 100%;
       max-width: 600px;
-      background-color: #fff;
+      background: #fff;
       border-radius: 8px;
       padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     header {
       text-align: center;
       margin-bottom: 20px;
     }
     .logo {
-      max-width: 150px;
+      width: 150px;
       height: auto;
       display: block;
       margin: 0 auto 10px;
@@ -48,21 +48,19 @@
       margin-top: 20px;
       margin-bottom: 10px;
     }
-    label, input, select, button {
+    label, select, input, button {
+      display: block;
       width: 100%;
       margin: 10px 0;
       font-size: 1em;
-    }
-    input, select, button {
       padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
     }
     button {
       background-color: #ff66a3;
-      color: #fff;
+      color: white;
       border: none;
       cursor: pointer;
+      border-radius: 4px;
     }
     button:hover {
       background-color: #ff3385;
@@ -82,19 +80,22 @@
 <body>
   <div class="container">
     <header>
+      <!-- Asegúrate de subir el archivo logo.png a tu repositorio -->
       <img src="logo.png" alt="Lo de Mica" class="logo">
       <h1>Lo de Mica - Reserva de Turnos</h1>
+      <p>Elige un servicio y reserva tu turno</p>
     </header>
     <main>
-      <h2>Selecciona tu turno</h2>
+      <h2>Selecciona tu Servicio</h2>
       <label for="servicio">Servicio:</label>
       <select id="servicio">
         <option value="20">Depilación - 20 minutos</option>
         <option value="40">Depilación Cuerpo Completo - 40 minutos</option>
       </select>
       
+      <h2>Turnos Disponibles</h2>
       <div id="turnos-container">
-        <!-- Aquí se mostrarán los turnos disponibles -->
+        <!-- Aquí se generarán los turnos según el servicio seleccionado -->
       </div>
       
       <h2>Datos del Cliente</h2>
@@ -107,21 +108,59 @@
   </div>
 
   <script type="module">
-    // Código de ejemplo para cargar turnos (aquí puedes integrar Firebase)
-    document.addEventListener("DOMContentLoaded", () => {
-      const turnosContainer = document.getElementById("turnos-container");
-      // Ejemplo de turnos disponibles (esto se reemplazará con los datos de Firebase)
-      const dummyTurnos = [
-        { fecha: "2025-02-12", hora: "10:00", dia: "miércoles", disponible: true },
-        { fecha: "2025-02-12", hora: "10:20", dia: "miércoles", disponible: true },
-        { fecha: "2025-02-12", hora: "10:40", dia: "miércoles", disponible: true }
-      ];
-      dummyTurnos.forEach(turno => {
+    // Función para generar turnos automáticamente según la duración (en minutos)
+    function generarTurnos(duracion) {
+      const turnos = [];
+      // Para este ejemplo, usamos una fecha y día fijos. Luego podrás hacerlos dinámicos.
+      const fechaFija = "2025-02-12";
+      const diaFijo = "miércoles";
+      // Definimos el rango de horarios: de 10:00 a 18:00
+      let horaInicio = new Date();
+      horaInicio.setHours(10, 0, 0, 0);
+      const horaFin = new Date();
+      horaFin.setHours(18, 0, 0, 0);
+      
+      while (horaInicio < horaFin) {
+        const horas = ("0" + horaInicio.getHours()).slice(-2);
+        const minutos = ("0" + horaInicio.getMinutes()).slice(-2);
+        turnos.push({
+          fecha: fechaFija,
+          dia: diaFijo,
+          hora: `${horas}:${minutos}`,
+          disponible: true
+        });
+        // Sumar 'duracion' minutos a la hora de inicio
+        horaInicio = new Date(horaInicio.getTime() + duracion * 60000);
+      }
+      return turnos;
+    }
+
+    // Función para mostrar los turnos en la página
+    function mostrarTurnos(turnos) {
+      const container = document.getElementById("turnos-container");
+      container.innerHTML = "";
+      turnos.forEach(turno => {
         const div = document.createElement("div");
         div.className = "turno";
-        div.innerHTML = `<strong>${turno.fecha} - ${turno.hora}</strong><br>Día: ${turno.dia} - Disponible: ${turno.disponible ? "Sí" : "No"}`;
-        turnosContainer.appendChild(div);
+        div.innerHTML = `<strong>${turno.fecha} - ${turno.hora}</strong><br>Día: ${turno.dia}<br>Disponible: ${turno.disponible ? "Sí" : "No"}`;
+        container.appendChild(div);
       });
+    }
+
+    // Al cargar la página, se generan y muestran los turnos según el servicio seleccionado
+    document.addEventListener("DOMContentLoaded", () => {
+      const selectServicio = document.getElementById("servicio");
+
+      const actualizarTurnos = () => {
+        const duracion = parseInt(selectServicio.value, 10); // 20 o 40
+        const turnosGenerados = generarTurnos(duracion);
+        mostrarTurnos(turnosGenerados);
+      };
+
+      // Inicializar la generación de turnos
+      actualizarTurnos();
+      // Actualizar cuando se cambia el servicio
+      selectServicio.addEventListener("change", actualizarTurnos);
     });
   </script>
 </body>

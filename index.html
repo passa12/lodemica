@@ -3,49 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lodemica Turnos</title>
-    <script type="module">
-        // Importar Firebase desde un CDN
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyB98r0hWQe5e6l_-kt_uo6UtnJ8qiQPnjU",
-            authDomain: "lodemicaturnos.firebaseapp.com",
-            projectId: "lodemicaturnos",
-            storageBucket: "lodemicaturnos.firebasestorage.app",
-            messagingSenderId: "211971887324",
-            appId: "1:211971887324:web:eb0844c882be45c7b16419"
-        };
-
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Obtener los turnos desde Firebase
-        async function cargarTurnos() {
-            const querySnapshot = await getDocs(collection(db, "turnos"));
-            let turnosHtml = "<h2>Turnos Disponibles</h2>";
-            
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                turnosHtml += `<p>${data.fecha} - ${data.hora} - ${data.dia} - Disponible: ${data.disponible ? "Sí" : "No"}</p>`;
-            });
-
-            document.getElementById("turnos").innerHTML = turnosHtml;
+    <title>Lo de Mica - Turnos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffe6f2;
+            text-align: center;
+            color: #333;
         }
-
-        // Llamar a la función para mostrar los turnos
-        cargarTurnos();
-    </script>
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        h1 {
+            color: #ff99cc;
+        }
+        .turno {
+            background: #ffccdd;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #ff66a3;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #ff3385;
+        }
+    </style>
 </head>
 <body>
-    <h1>Bienvenido a Lo de Mica</h1>
-    <p>Reserva tu turno online.</p>
-
-    <div id="turnos">
-        <p>Cargando turnos...</p>
+    <div class="container">
+        <img src="logo.png" alt="Lo de Mica - Depilación Definitiva">
+        <h1>Bienvenido a Lo de Mica</h1>
+        <p>Reserva tu turno online.</p>
+        <div id="turnos"></div>
     </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const turnosDiv = document.getElementById("turnos");
+            
+            // Aquí iría la conexión a Firebase para traer los turnos
+            const turnos = [
+                { fecha: "2025-02-12", hora: "10:00", dia: "miércoles", disponible: true },
+                { fecha: "2025-02-13", hora: "12:00", dia: "jueves", disponible: false }
+            ];
+
+            turnos.forEach(turno => {
+                const turnoDiv = document.createElement("div");
+                turnoDiv.className = "turno";
+                turnoDiv.innerHTML = `
+                    <p>${turno.fecha} - ${turno.hora} - ${turno.dia} - Disponible: ${turno.disponible ? "Sí" : "No"}</p>
+                    ${turno.disponible ? '<button>Reservar</button>' : ''}
+                `;
+                turnosDiv.appendChild(turnoDiv);
+            });
+        });
+    </script>
 </body>
 </html>
+

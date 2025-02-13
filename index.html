@@ -126,5 +126,30 @@
       </form>
     </main>
   </div>
+
+  <script>
+    const servicios = [
+      { id: 1, nombre: "Depilación Piernas Completas" },
+      { id: 2, nombre: "Depilación Medias Piernas" },
+      { id: 3, nombre: "Depilación Axilas" },
+      { id: 4, nombre: "Depilación Cejas" },
+      { id: 5, nombre: "Depilación Bozo" }
+    ];
+    
+    function cargarServicios() {
+      const contenedor = document.getElementById("servicio-container");
+      servicios.forEach(servicio => {
+        const label = document.createElement("label");
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.value = servicio.id;
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(servicio.nombre));
+        contenedor.appendChild(label);
+      });
+    }
+    
+    document.addEventListener("DOMContentLoaded", cargarServicios);
+  </script>
 </body>
 </html>

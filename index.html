@@ -40,11 +40,13 @@
     h1 {
       font-size: 1.6em;
       color: #ff80b3;
+      text-align: center;
     }
     h2 {
       font-size: 1.2em;
       color: #ff66a3;
       margin-top: 15px;
+      margin-bottom: 10px;
     }
     label, select, input, button {
       display: block;
@@ -75,11 +77,10 @@
     #servicio-container label {
       display: flex;
       align-items: center;
-      margin-bottom: 5px;
+      gap: 8px;
+      margin-bottom: 8px;
       cursor: pointer;
-    }
-    #servicio-container input {
-      margin-right: 8px;
+      font-size: 0.95em;
     }
     /* Estilos para los turnos */
     #turnos-container {
@@ -87,7 +88,7 @@
     }
     .turno {
       background-color: #fff0f5;
-      padding: 10px;
+      padding: 10px 90px 10px 10px; /* espacio a la derecha para el botón */
       margin-bottom: 10px;
       border-radius: 4px;
       position: relative;
@@ -112,7 +113,7 @@
 <body>
   <div class="container">
     <header>
-      <!-- Sube el archivo logo.png a la raíz de tu repositorio -->
+      <!-- Asegúrate de subir el archivo logo.png a la raíz de tu repositorio -->
       <img src="logo.png" alt="Lo de Mica" class="logo">
       <h1>Reserva de Turnos</h1>
       <p>Elige tus servicios y reserva tu turno</p>
@@ -137,7 +138,7 @@
   </div>
 
   <script type="module">
-    // Listado completo de servicios (duración: 40 para "CUERPO COMPLETO", 20 para el resto)
+    // Listado completo de servicios
     const servicios = [
       { nombre: "ELLAS: PROMO 1 (AXILAS, CAVADO, PIERNA)", duracion: 20 },
       { nombre: "ELLAS: PROMO 2 (BOZO, AXILAS, CAVADO, PIERNA, TIRO)", duracion: 20 },
@@ -167,7 +168,7 @@
       { nombre: "ESPALDA COMPLETA", duracion: 20 }
     ];
     
-    // Cargar servicios en el contenedor
+    // Cargar los servicios en el contenedor de checkboxes
     function cargarServicios() {
       const contenedor = document.getElementById("servicio-container");
       servicios.forEach(servicio => {
@@ -183,7 +184,8 @@
     }
     document.addEventListener("DOMContentLoaded", cargarServicios);
     
-    // Calcular la duración del turno: si se selecciona al menos un servicio que incluya "CUERPO COMPLETO", se asigna 40; de lo contrario, 20.
+    // Calcular la duración del turno:
+    // Si se selecciona algún servicio que incluya "CUERPO COMPLETO", se asigna 40; de lo contrario, 20.
     function calcularDuracion() {
       const checkboxes = document.querySelectorAll("#servicio-container input:checked");
       let duracion = 20;
@@ -195,7 +197,7 @@
       return duracion;
     }
     
-    // Generar turnos automáticamente (rango: 10:00 a 18:00) según la duración
+    // Generar turnos (rango: 10:00 a 18:00) según la duración
     function generarTurnos(duracion) {
       const turnos = [];
       const fechaFija = "2025-02-12"; // Ejemplo: se puede hacer dinámico
@@ -216,7 +218,7 @@
     // Variable global para almacenar el turno seleccionado
     let turnoSeleccionado = null;
     
-    // Mostrar turnos en el contenedor con opción para seleccionar
+    // Mostrar los turnos en el contenedor, con botón para seleccionar
     function mostrarTurnos(turnos) {
       const container = document.getElementById("turnos-container");
       container.innerHTML = "";

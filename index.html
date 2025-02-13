@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lo de Mica - Reserva de Turnos</title>
   <style>
-    /* Estilos básicos y responsivos */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -25,7 +24,7 @@
       background: #fff;
       border-radius: 8px;
       padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
     header {
       text-align: center;
@@ -40,13 +39,11 @@
     h1 {
       font-size: 1.6em;
       color: #ff80b3;
-      text-align: center;
     }
     h2 {
       font-size: 1.2em;
       color: #ff66a3;
       margin-top: 15px;
-      margin-bottom: 10px;
     }
     label, select, input, button {
       display: block;
@@ -66,36 +63,33 @@
     button:hover {
       background-color: #ff3385;
     }
-    /* Contenedor de servicios (checkboxes) */
     #servicio-container {
-      max-height: 150px;
+      max-height: 300px;
       overflow-y: auto;
       border: 1px solid #ddd;
       padding: 10px;
       margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
     }
     #servicio-container label {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      font-size: 0.95em;
+      margin-bottom: 5px;
+      padding: 5px;
     }
-    /* Estilos para los turnos */
-    #turnos-container {
-      margin: 20px 0;
+    #servicio-container input {
+      margin-right: 10px;
     }
-    .turno {
+    #turnos-container .turno {
       background-color: #fff0f5;
-      padding: 10px 90px 10px 10px; /* espacio extra a la derecha para el botón */
+      padding: 10px;
       margin-bottom: 10px;
       border-radius: 4px;
       position: relative;
-      text-align: left;
-    }
-    .turno.selected {
-      border: 2px solid #ff3385;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .btn-select {
       background-color: #ff66a3;
@@ -104,9 +98,6 @@
       padding: 5px 10px;
       border-radius: 3px;
       cursor: pointer;
-      position: absolute;
-      top: 10px;
-      right: 10px;
     }
     .btn-select:hover {
       background-color: #ff3385;
@@ -116,7 +107,6 @@
 <body>
   <div class="container">
     <header>
-      <!-- Asegúrate de subir el archivo logo.png a la raíz de tu repositorio -->
       <img src="logo.png" alt="Lo de Mica" class="logo">
       <h1>Reserva de Turnos</h1>
       <p>Elige tus servicios y reserva tu turno</p>
@@ -139,181 +129,5 @@
       </form>
     </main>
   </div>
-
-  <script type="module">
-    // ----------------- Firebase Imports -----------------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    
-    // ----------------- Firebase Configuration -----------------
-    const firebaseConfig = {
-      apiKey: "AIzaSyB98r0hWQe5e6l_-kt_uo6UtnJ8qiQPnjU",
-      authDomain: "lodemicaturnos.firebaseapp.com",
-      projectId: "lodemicaturnos",
-      storageBucket: "lodemicaturnos.firebasestorage.app",
-      messagingSenderId: "211971887324",
-      appId: "1:211971887324:web:eb0844c882be45c7b16419"
-    };
-    
-    const appFirebase = initializeApp(firebaseConfig);
-    const db = getFirestore(appFirebase);
-    // ----------------------------------------------------------
-    
-    // ----------------- Servicios y Turnos -----------------
-    // Listado de servicios (duración: 40 minutos solo para los que indican "CUERPO COMPLETO")
-    const servicios = [
-      { nombre: "ELLAS: PROMO 1 (AXILAS, CAVADO, PIERNA)", duracion: 20 },
-      { nombre: "ELLAS: PROMO 2 (BOZO, AXILAS, CAVADO, PIERNA, TIRO)", duracion: 20 },
-      { nombre: "ELLAS: CUERPO COMPLETO", duracion: 40 },
-      { nombre: "ELLOS: PROMO1 (PECHO, ABDOMEN, ESPALDA)", duracion: 20 },
-      { nombre: "ELLOS: PROMO2 (PECHO, ABDOMEN, ESPALDA, PIERNAS)", duracion: 20 },
-      { nombre: "ELLOS: CUERPO COMPLETO", duracion: 40 },
-      { nombre: "BOZO", duracion: 20 },
-      { nombre: "MENTON", duracion: 20 },
-      { nombre: "MEJILLAS", duracion: 20 },
-      { nombre: "FRENTE", duracion: 20 },
-      { nombre: "NARIZ", duracion: 20 },
-      { nombre: "ROSTRO COMPLETO", duracion: 20 },
-      { nombre: "MEDIA PIERNA", duracion: 20 },
-      { nombre: "PIERNA ENTERA", duracion: 20 },
-      { nombre: "MEDIO BRAZO", duracion: 20 },
-      { nombre: "BRAZO ENTERO", duracion: 20 },
-      { nombre: "CAVADO BIKINI", duracion: 20 },
-      { nombre: "CAVADO COMPLETO", duracion: 20 },
-      { nombre: "TIRA DE COLA", duracion: 20 },
-      { nombre: "GLUTEOS", duracion: 20 },
-      { nombre: "DEDO Y EMPEINE", duracion: 20 },
-      { nombre: "MANOS", duracion: 20 },
-      { nombre: "LINEA ALBA", duracion: 20 },
-      { nombre: "PELVIS", duracion: 20 },
-      { nombre: "ESPALDA BAJA", duracion: 20 },
-      { nombre: "ESPALDA COMPLETA", duracion: 20 }
-    ];
-    
-    // Cargar los servicios en el contenedor de checkboxes
-    function cargarServicios() {
-      const contenedor = document.getElementById("servicio-container");
-      servicios.forEach(servicio => {
-        const label = document.createElement("label");
-        const input = document.createElement("input");
-        input.type = "checkbox";
-        input.value = servicio.duracion;
-        input.dataset.nombre = servicio.nombre;
-        label.appendChild(input);
-        label.appendChild(document.createTextNode(servicio.nombre));
-        contenedor.appendChild(label);
-      });
-    }
-    document.addEventListener("DOMContentLoaded", cargarServicios);
-    
-    // Calcular la duración del turno: si se selecciona algún servicio que incluya "CUERPO COMPLETO", se asigna 40; de lo contrario, 20.
-    function calcularDuracion() {
-      const checkboxes = document.querySelectorAll("#servicio-container input:checked");
-      let duracion = 20;
-      checkboxes.forEach(cb => {
-        if (cb.dataset.nombre.includes("CUERPO COMPLETO")) {
-          duracion = 40;
-        }
-      });
-      return duracion;
-    }
-    
-    // Generar turnos automáticamente (rango: 10:00 a 18:00) según la duración
-    function generarTurnos(duracion) {
-      const turnos = [];
-      const fechaFija = "2025-02-12"; // Ejemplo; se puede hacer dinámico
-      const diaFijo = "miércoles";    // Ejemplo; se puede hacer dinámico
-      let horaInicio = new Date();
-      horaInicio.setHours(10, 0, 0, 0);
-      const horaFin = new Date();
-      horaFin.setHours(18, 0, 0, 0);
-      while (horaInicio < horaFin) {
-        const h = ("0" + horaInicio.getHours()).slice(-2);
-        const m = ("0" + horaInicio.getMinutes()).slice(-2);
-        turnos.push({ fecha: fechaFija, dia: diaFijo, hora: `${h}:${m}`, disponible: true });
-        horaInicio = new Date(horaInicio.getTime() + duracion * 60000);
-      }
-      return turnos;
-    }
-    
-    // Variable global para almacenar el turno seleccionado
-    let turnoSeleccionado = null;
-    
-    // Mostrar los turnos en el contenedor, con botón para seleccionar
-    function mostrarTurnos(turnos) {
-      const container = document.getElementById("turnos-container");
-      container.innerHTML = "";
-      turnoSeleccionado = null;
-      turnos.forEach(turno => {
-        const div = document.createElement("div");
-        div.className = "turno";
-        div.innerHTML = `<strong>${turno.fecha} - ${turno.hora}</strong><br>Día: ${turno.dia}<br>Disponible: ${turno.disponible ? "Sí" : "No"}`;
-        const btn = document.createElement("button");
-        btn.innerText = "Seleccionar";
-        btn.className = "btn-select";
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".turno").forEach(el => el.classList.remove("selected"));
-          div.classList.add("selected");
-          turnoSeleccionado = turno;
-        });
-        div.appendChild(btn);
-        container.appendChild(div);
-      });
-    }
-    
-    // Evento para el formulario de servicios para generar turnos
-    document.getElementById("servicio-form").addEventListener("submit", event => {
-      event.preventDefault();
-      const duracion = calcularDuracion();
-      const turnosGenerados = generarTurnos(duracion);
-      mostrarTurnos(turnosGenerados);
-    });
-    // ----------------- Fin Servicios y Turnos -----------------
-    
-    // ----------------- Firebase Integration -----------------
-    async function guardarTurnoPaciente(email, datosTurno) {
-      const pacienteRef = doc(db, "pacientes", email);
-      const pacienteSnap = await getDoc(pacienteRef);
-      if (pacienteSnap.exists()) {
-        await updateDoc(pacienteRef, {
-          historiaClinica: arrayUnion(datosTurno)
-        });
-      } else {
-        await setDoc(pacienteRef, {
-          nombre: datosTurno.nombre,
-          fechaNacimiento: datosTurno.fechaNacimiento,
-          historiaClinica: [datosTurno]
-        });
-      }
-      alert("Reserva registrada exitosamente.");
-    }
-    
-    // Evento para el formulario de reserva del cliente
-    document.getElementById("reserva-form").addEventListener("submit", async event => {
-      event.preventDefault();
-      const nombre = document.getElementById("nombre").value;
-      const email = document.getElementById("email").value;
-      const fechaNacimiento = document.getElementById("fechaNacimiento").value;
-      if (!turnoSeleccionado) {
-        alert("Por favor, selecciona un turno disponible.");
-        return;
-      }
-      const datosTurno = {
-        nombre,
-        fechaNacimiento,
-        fechaAtencion: turnoSeleccionado.fecha,
-        horaTurno: turnoSeleccionado.hora,
-        dia: turnoSeleccionado.dia,
-        servicios: Array.from(document.querySelectorAll("#servicio-container input:checked")).map(cb => cb.dataset.nombre)
-      };
-      try {
-        await guardarTurnoPaciente(email, datosTurno);
-      } catch (error) {
-        console.error("Error al guardar la reserva:", error);
-        alert("Ocurrió un error al guardar la reserva.");
-      }
-    });
-    // ----------------- Fin Firebase Integration -----------------
-  </script>
 </body>
 </html>

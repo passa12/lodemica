@@ -25,7 +25,7 @@
       background: #fff;
       border-radius: 8px;
       padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     header {
       text-align: center;
@@ -40,6 +40,7 @@
     h1 {
       font-size: 1.6em;
       color: #ff80b3;
+      text-align: center;
     }
     h2 {
       font-size: 1.2em;
@@ -81,20 +82,20 @@
       cursor: pointer;
       font-size: 0.95em;
     }
-    #servicio-container input {
-      flex-shrink: 0;
-    }
     /* Estilos para los turnos */
     #turnos-container {
       margin: 20px 0;
     }
     .turno {
       background-color: #fff0f5;
-      padding: 10px 90px 10px 10px; /* Añadido padding-right para no solapar el botón */
+      padding: 10px 90px 10px 10px; /* espacio extra a la derecha para el botón */
       margin-bottom: 10px;
       border-radius: 4px;
       position: relative;
       text-align: left;
+    }
+    .turno.selected {
+      border: 2px solid #ff3385;
     }
     .btn-select {
       background-color: #ff66a3;
@@ -115,7 +116,7 @@
 <body>
   <div class="container">
     <header>
-      <!-- Sube el archivo logo.png a la raíz de tu repositorio -->
+      <!-- Asegúrate de subir el archivo logo.png a la raíz de tu repositorio -->
       <img src="logo.png" alt="Lo de Mica" class="logo">
       <h1>Reserva de Turnos</h1>
       <p>Elige tus servicios y reserva tu turno</p>
@@ -140,7 +141,26 @@
   </div>
 
   <script type="module">
-    // Listado de servicios con sus duraciones
+    // ----------------- Firebase Imports -----------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
+    // ----------------- Firebase Configuration -----------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyB98r0hWQe5e6l_-kt_uo6UtnJ8qiQPnjU",
+      authDomain: "lodemicaturnos.firebaseapp.com",
+      projectId: "lodemicaturnos",
+      storageBucket: "lodemicaturnos.firebasestorage.app",
+      messagingSenderId: "211971887324",
+      appId: "1:211971887324:web:eb0844c882be45c7b16419"
+    };
+    
+    const appFirebase = initializeApp(firebaseConfig);
+    const db = getFirestore(appFirebase);
+    // ----------------------------------------------------------
+    
+    // ----------------- Servicios y Turnos -----------------
+    // Listado de servicios (duración: 40 minutos solo para los que indican "CUERPO COMPLETO")
     const servicios = [
       { nombre: "ELLAS: PROMO 1 (AXILAS, CAVADO, PIERNA)", duracion: 20 },
       { nombre: "ELLAS: PROMO 2 (BOZO, AXILAS, CAVADO, PIERNA, TIRO)", duracion: 20 },
@@ -170,7 +190,7 @@
       { nombre: "ESPALDA COMPLETA", duracion: 20 }
     ];
     
-    // Cargar servicios en el contenedor
+    // Cargar los servicios en el contenedor de checkboxes
     function cargarServicios() {
       const contenedor = document.getElementById("servicio-container");
       servicios.forEach(servicio => {
@@ -186,7 +206,7 @@
     }
     document.addEventListener("DOMContentLoaded", cargarServicios);
     
-    // Calcular duración: si se selecciona algún servicio con "CUERPO COMPLETO", duración = 40, de lo contrario 20.
+    // Calcular la duración del turno: si se selecciona algún servicio que incluya "CUERPO COMPLETO", se asigna 40; de lo contrario, 20.
     function calcularDuracion() {
       const checkboxes = document.querySelectorAll("#servicio-container input:checked");
       let duracion = 20;
@@ -198,11 +218,11 @@
       return duracion;
     }
     
-    // Generar turnos (rango: 10:00 a 18:00) según la duración
+    // Generar turnos automáticamente (rango: 10:00 a 18:00) según la duración
     function generarTurnos(duracion) {
       const turnos = [];
-      const fechaFija = "2025-02-12"; // Ejemplo: se puede hacer dinámico
-      const diaFijo = "miércoles";    // Ejemplo: se puede hacer dinámico
+      const fechaFija = "2025-02-12"; // Ejemplo; se puede hacer dinámico
+      const diaFijo = "miércoles";    // Ejemplo; se puede hacer dinámico
       let horaInicio = new Date();
       horaInicio.setHours(10, 0, 0, 0);
       const horaFin = new Date();
@@ -210,7 +230,7 @@
       while (horaInicio < horaFin) {
         const h = ("0" + horaInicio.getHours()).slice(-2);
         const m = ("0" + horaInicio.getMinutes()).slice(-2);
-        turnos.push({ fecha: fechaFija, dia: diaFija, hora: `${h}:${m}`, disponible: true });
+        turnos.push({ fecha: fechaFija, dia: diaFijo, hora: `${h}:${m}`, disponible: true });
         horaInicio = new Date(horaInicio.getTime() + duracion * 60000);
       }
       return turnos;
@@ -219,7 +239,7 @@
     // Variable global para almacenar el turno seleccionado
     let turnoSeleccionado = null;
     
-    // Mostrar turnos en el contenedor con botón para seleccionar
+    // Mostrar los turnos en el contenedor, con botón para seleccionar
     function mostrarTurnos(turnos) {
       const container = document.getElementById("turnos-container");
       container.innerHTML = "";
@@ -248,5 +268,52 @@
       const turnosGenerados = generarTurnos(duracion);
       mostrarTurnos(turnosGenerados);
     });
+    // ----------------- Fin Servicios y Turnos -----------------
     
-    // -------------- Firebase Integration --------------\n    import { initializeApp } from \"https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js\";\n    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } from \"https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js\";\n    \n    const firebaseConfig = {\n      apiKey: \"AIzaSyB98r0hWQe5e6l_-kt_uo6UtnJ8qiQPnjU\",\n      authDomain: \"lodemicaturnos.firebaseapp.com\",\n      projectId: \"lodemicaturnos\",\n      storageBucket: \"lodemicaturnos.firebasestorage.app\",\n      messagingSenderId: \"211971887324\",\n      appId: \"1:211971887324:web:eb0844c882be45c7b16419\"\n    };\n    \n    const appFirebase = initializeApp(firebaseConfig);\n    const db = getFirestore(appFirebase);\n    \n    async function guardarTurnoPaciente(email, datosTurno) {\n      const pacienteRef = doc(db, \"pacientes\", email);\n      const pacienteSnap = await getDoc(pacienteRef);\n      if (pacienteSnap.exists()) {\n        await updateDoc(pacienteRef, {\n          historiaClinica: arrayUnion(datosTurno)\n        });\n      } else {\n        await setDoc(pacienteRef, {\n          nombre: datosTurno.nombre,\n          fechaNacimiento: datosTurno.fechaNacimiento,\n          historiaClinica: [datosTurno]\n        });\n      }\n      alert(\"Reserva registrada exitosamente.\");\n    }\n    \n    // Evento para el formulario de reserva del cliente\n    document.getElementById(\"reserva-form\").addEventListener(\"submit\", async event => {\n      event.preventDefault();\n      const nombre = document.getElementById(\"nombre\").value;\n      const email = document.getElementById(\"email\").value;\n      const fechaNacimiento = document.getElementById(\"fechaNacimiento\").value;\n      if (!turnoSeleccionado) {\n        alert(\"Por favor, selecciona un turno disponible.\");\n        return;\n      }\n      const datosTurno = {\n        nombre,\n        fechaNacimiento,\n        fechaAtencion: turnoSeleccionado.fecha,\n        horaTurno: turnoSeleccionado.hora,\n        dia: turnoSeleccionado.dia,\n        servicios: Array.from(document.querySelectorAll(\"#servicio-container input:checked\")).map(cb => cb.dataset.nombre)\n      };\n      try {\n        await guardarTurnoPaciente(email, datosTurno);\n      } catch (error) {\n        console.error(\"Error al guardar la reserva:\", error);\n        alert(\"Ocurrió un error al guardar la reserva.\");\n      }\n    });\n  </script>\n</body>\n</html>\n"}]}
+    // ----------------- Firebase Integration -----------------
+    async function guardarTurnoPaciente(email, datosTurno) {
+      const pacienteRef = doc(db, "pacientes", email);
+      const pacienteSnap = await getDoc(pacienteRef);
+      if (pacienteSnap.exists()) {
+        await updateDoc(pacienteRef, {
+          historiaClinica: arrayUnion(datosTurno)
+        });
+      } else {
+        await setDoc(pacienteRef, {
+          nombre: datosTurno.nombre,
+          fechaNacimiento: datosTurno.fechaNacimiento,
+          historiaClinica: [datosTurno]
+        });
+      }
+      alert("Reserva registrada exitosamente.");
+    }
+    
+    // Evento para el formulario de reserva del cliente
+    document.getElementById("reserva-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const nombre = document.getElementById("nombre").value;
+      const email = document.getElementById("email").value;
+      const fechaNacimiento = document.getElementById("fechaNacimiento").value;
+      if (!turnoSeleccionado) {
+        alert("Por favor, selecciona un turno disponible.");
+        return;
+      }
+      const datosTurno = {
+        nombre,
+        fechaNacimiento,
+        fechaAtencion: turnoSeleccionado.fecha,
+        horaTurno: turnoSeleccionado.hora,
+        dia: turnoSeleccionado.dia,
+        servicios: Array.from(document.querySelectorAll("#servicio-container input:checked")).map(cb => cb.dataset.nombre)
+      };
+      try {
+        await guardarTurnoPaciente(email, datosTurno);
+      } catch (error) {
+        console.error("Error al guardar la reserva:", error);
+        alert("Ocurrió un error al guardar la reserva.");
+      }
+    });
+    // ----------------- Fin Firebase Integration -----------------
+  </script>
+</body>
+</html>

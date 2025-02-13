@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lo de Mica - Reserva de Turnos</title>
   <style>
-    /* Estilos básicos y responsivos */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -74,24 +73,31 @@
       margin-bottom: 10px;
       border-radius: 4px;
       text-align: left;
+      position: relative;
     }
-    /* Estilos para el listado de servicios (checkboxes) */
+    /* Mejorar alineación de los checkboxes */
     #servicio-container {
-      max-height: 200px;
+      max-height: 250px;
       overflow-y: auto;
       border: 1px solid #ddd;
-      padding: 5px;
+      padding: 10px;
     }
     #servicio-container label {
-      display: block;
-      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    /* Ajuste en los botones de turnos */
+    .turno button {
+      margin-top: 5px;
+      width: 100%;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <!-- Asegúrate de subir el archivo logo.png a tu repositorio -->
       <img src="logo.png" alt="Lo de Mica" class="logo">
       <h1>Lo de Mica - Reserva de Turnos</h1>
       <p>Elige uno o más servicios y reserva tu turno</p>
@@ -99,17 +105,11 @@
     <main>
       <h2>Selecciona tus Servicios</h2>
       <form id="servicio-form">
-        <div id="servicio-container">
-          <!-- Se insertarán los checkboxes de servicios aquí -->
-        </div>
+        <div id="servicio-container"></div>
         <button type="submit">Generar Turnos Disponibles</button>
       </form>
-      
       <h2>Turnos Disponibles</h2>
-      <div id="turnos-container">
-        <!-- Se mostrarán los turnos generados -->
-      </div>
-      
+      <div id="turnos-container"></div>
       <h2>Datos del Cliente</h2>
       <form id="reserva-form">
         <input type="text" id="nombre" placeholder="Nombre" required>
@@ -119,9 +119,7 @@
       </form>
     </main>
   </div>
-
   <script type="module">
-    // Array de servicios con sus nombres y duraciones (20 o 40 minutos)
     const servicios = [
       { nombre: "ELLAS: PROMO 1 (AXILAS, CAVADO, PIERNA)", duracion: 20 },
       { nombre: "ELLAS: PROMO 2 (BOZO, AXILAS, CAVADO, PIERNA, TIRO)", duracion: 20 },
@@ -150,79 +148,16 @@
       { nombre: "ESPALDA BAJA", duracion: 20 },
       { nombre: "ESPALDA COMPLETA", duracion: 20 }
     ];
-
-    // Insertar los servicios como checkboxes en el contenedor
     const servicioContainer = document.getElementById("servicio-container");
     servicios.forEach(servicio => {
       const label = document.createElement("label");
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.value = servicio.duracion; // Almacena la duración del servicio
-      checkbox.dataset.nombre = servicio.nombre; // Almacena el nombre del servicio
+      checkbox.value = servicio.duracion;
+      checkbox.dataset.nombre = servicio.nombre;
       label.appendChild(checkbox);
       label.appendChild(document.createTextNode(" " + servicio.nombre));
       servicioContainer.appendChild(label);
-    });
-
-    // Función para calcular la duración del turno:
-    // Si se selecciona al menos un servicio que contenga 'CUERPO COMPLETO', se asigna 40 minutos;
-    // en caso contrario, se asigna 20 minutos.
-    function calcularDuracion() {
-      const checkboxes = document.querySelectorAll("#servicio-container input:checked");
-      let duracion = 20;
-      checkboxes.forEach(checkbox => {
-        if (checkbox.dataset.nombre.includes("CUERPO COMPLETO")) {
-          duracion = 40;
-        }
-      });
-      return duracion;
-    }
-
-    // Función para generar turnos automáticamente según la duración
-    function generarTurnos(duracion) {
-      const turnos = [];
-      // Para el ejemplo, usamos una fecha y día fijos; más adelante se pueden hacer dinámicos.
-      const fechaFija = "2025-02-12";
-      const diaFijo = "miércoles";
-      // Definimos el rango de horarios: de 10:00 a 18:00
-      let horaInicio = new Date();
-      horaInicio.setHours(10, 0, 0, 0);
-      const horaFin = new Date();
-      horaFin.setHours(18, 0, 0, 0);
-      
-      while (horaInicio < horaFin) {
-        const horas = ("0" + horaInicio.getHours()).slice(-2);
-        const minutos = ("0" + horaInicio.getMinutes()).slice(-2);
-        turnos.push({
-          fecha: fechaFija,
-          dia: diaFijo,
-          hora: `${horas}:${minutos}`,
-          disponible: true
-        });
-        // Sumar 'duracion' minutos a la hora de inicio
-        horaInicio = new Date(horaInicio.getTime() + duracion * 60000);
-      }
-      return turnos;
-    }
-
-    // Función para mostrar los turnos en la página
-    function mostrarTurnos(turnos) {
-      const container = document.getElementById("turnos-container");
-      container.innerHTML = "";
-      turnos.forEach(turno => {
-        const div = document.createElement("div");
-        div.className = "turno";
-        div.innerHTML = `<strong>${turno.fecha} - ${turno.hora}</strong><br>Día: ${turno.dia}<br>Disponible: ${turno.disponible ? "Sí" : "No"}`;
-        container.appendChild(div);
-      });
-    }
-
-    // Evento para el formulario de servicios
-    document.getElementById("servicio-form").addEventListener("submit", event => {
-      event.preventDefault();
-      const duracion = calcularDuracion();
-      const turnosGenerados = generarTurnos(duracion);
-      mostrarTurnos(turnosGenerados);
     });
   </script>
 </body>

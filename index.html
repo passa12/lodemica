@@ -13,7 +13,7 @@
     }
     body {
       font-family: Arial, sans-serif;
-      background-color: #ffe6f2; /* Fondo rosado */
+      background-color: #ffe6f2;
       color: #333;
       display: flex;
       justify-content: center;
@@ -25,7 +25,7 @@
       background: #fff;
       border-radius: 8px;
       padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     header {
       text-align: center;
@@ -41,10 +41,7 @@
       font-size: 1.8em;
       color: #ff80b3;
       margin-bottom: 10px;
-    }
-    p {
-      color: #333;
-      margin-bottom: 15px;
+      text-align: center;
     }
     h2 {
       font-size: 1.4em;
@@ -65,37 +62,67 @@
       border: none;
       cursor: pointer;
       border-radius: 4px;
+      padding: 10px;
     }
     button:hover {
       background-color: #ff3385;
     }
+    /* Estilos para el listado de servicios (checkboxes) */
+    #servicio-container {
+      max-height: 250px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 10px;
+    }
+    #servicio-container label {
+      display: flex;
+      align-items: center;
+      font-size: 0.95em;
+      padding: 5px 0;
+    }
+    #servicio-container input {
+      margin-right: 5px;
+      flex-shrink: 0;
+    }
+    /* Estilos para los turnos */
     #turnos-container {
       margin: 20px 0;
     }
     .turno {
       background-color: #fff0f5;
-      padding: 10px;
+      padding: 10px 10px 10px 10px;
       margin-bottom: 10px;
       border-radius: 4px;
+      position: relative;
       text-align: left;
+      border: 1px solid transparent;
     }
-    /* Estilos para el listado de servicios (checkboxes) */
-    #servicio-container {
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 5px;
+    .turno.selected {
+      border: 2px solid #ff3385;
     }
-    #servicio-container label {
-      display: block;
-      margin-bottom: 5px;
+    .btn-select {
+      background-color: #ff66a3;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .btn-select:hover {
+      background-color: #ff3385;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <!-- Asegúrate de subir el archivo logo.png a tu repositorio (raíz) -->
+      <!-- Asegúrate de subir el archivo logo.png a la raíz de tu repositorio -->
       <img src="logo.png" alt="Lo de Mica" class="logo">
       <h1>Lo de Mica - Reserva de Turnos</h1>
       <p>Elige uno o más servicios y reserva tu turno</p>
@@ -106,7 +133,7 @@
         <div id="servicio-container">
           <!-- Se insertarán los checkboxes de servicios aquí -->
         </div>
-        <button type="submit">Generar Turnos Disponibles</button>
+        <button type="submit">Ver Turnos Disponibles</button>
       </form>
       
       <h2>Turnos Disponibles</h2>
@@ -118,6 +145,7 @@
       <form id="reserva-form">
         <input type="text" id="nombre" placeholder="Nombre" required>
         <input type="email" id="email" placeholder="Correo Electrónico" required>
+        <label for="fechaNacimiento">Fecha de Nacimiento</label>
         <input type="date" id="fechaNacimiento" required>
         <button type="submit">Reservar Turno</button>
       </form>
@@ -125,7 +153,7 @@
   </div>
 
   <script type="module">
-    // Array de servicios con sus nombres y duraciones (20 o 40 minutos)
+    // Lista completa de servicios
     const servicios = [
       { nombre: "ELLAS: PROMO 1 (AXILAS, CAVADO, PIERNA)", duracion: 20 },
       { nombre: "ELLAS: PROMO 2 (BOZO, AXILAS, CAVADO, PIERNA, TIRO)", duracion: 20 },
@@ -154,23 +182,22 @@
       { nombre: "ESPALDA BAJA", duracion: 20 },
       { nombre: "ESPALDA COMPLETA", duracion: 20 }
     ];
-
-    // Insertar los servicios como checkboxes en el contenedor
+    
+    // Cargar servicios en el contenedor de checkboxes en dos columnas
     const servicioContainer = document.getElementById("servicio-container");
     servicios.forEach(servicio => {
       const label = document.createElement("label");
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.value = servicio.duracion; // Almacena la duración del servicio
-      checkbox.dataset.nombre = servicio.nombre; // Almacena el nombre del servicio
+      checkbox.value = servicio.duracion; // Guarda la duración (20 o 40)
+      checkbox.dataset.nombre = servicio.nombre; // Guarda el nombre del servicio
       label.appendChild(checkbox);
       label.appendChild(document.createTextNode(" " + servicio.nombre));
       servicioContainer.appendChild(label);
     });
-
+    
     // Función para calcular la duración del turno:
-    // Si se selecciona al menos un servicio que contenga 'CUERPO COMPLETO', se asigna 40 minutos;
-    // en caso contrario, se asigna 20 minutos.
+    // Si se selecciona al menos un servicio que contenga "CUERPO COMPLETO", se asigna 40; de lo contrario, 20.
     function calcularDuracion() {
       const checkboxes = document.querySelectorAll("#servicio-container input:checked");
       let duracion = 20;
@@ -181,52 +208,120 @@
       });
       return duracion;
     }
-
-    // Función para generar turnos automáticamente según la duración
+    
+    // Función para generar turnos (rango: 10:00 a 18:00) según la duración
     function generarTurnos(duracion) {
       const turnos = [];
-      // Para el ejemplo, usamos una fecha y día fijos
-      const fechaFija = "2025-02-12";
-      const diaFijo = "miércoles";
-      // Definimos el rango de horarios: de 10:00 a 18:00
+      const fechaFija = "2025-02-12"; // Para el ejemplo; se puede hacer dinámico
+      const diaFijo = "miércoles";    // Para el ejemplo; se puede hacer dinámico
       let horaInicio = new Date();
       horaInicio.setHours(10, 0, 0, 0);
       const horaFin = new Date();
       horaFin.setHours(18, 0, 0, 0);
-      
       while (horaInicio < horaFin) {
         const horas = ("0" + horaInicio.getHours()).slice(-2);
         const minutos = ("0" + horaInicio.getMinutes()).slice(-2);
         turnos.push({
           fecha: fechaFija,
           dia: diaFijo,
-          hora: `${horas}:${minutos}`, // Con backticks
+          hora: `${horas}:${minutos}`,
           disponible: true
         });
-        // Sumar 'duracion' minutos a la hora de inicio
         horaInicio = new Date(horaInicio.getTime() + duracion * 60000);
       }
       return turnos;
     }
-
-    // Función para mostrar los turnos en la página
+    
+    // Variable global para almacenar el turno seleccionado
+    let turnoSeleccionado = null;
+    
+    // Función para mostrar los turnos en el contenedor, con un botón para seleccionar cada turno
     function mostrarTurnos(turnos) {
       const container = document.getElementById("turnos-container");
       container.innerHTML = "";
+      turnoSeleccionado = null;
       turnos.forEach(turno => {
         const div = document.createElement("div");
         div.className = "turno";
         div.innerHTML = `<strong>${turno.fecha} - ${turno.hora}</strong><br>Día: ${turno.dia}<br>Disponible: ${turno.disponible ? "Sí" : "No"}`;
+        const btn = document.createElement("button");
+        btn.innerText = "Seleccionar";
+        btn.className = "btn-select";
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".turno").forEach(el => el.classList.remove("selected"));
+          div.classList.add("selected");
+          turnoSeleccionado = turno;
+        });
+        div.appendChild(btn);
         container.appendChild(div);
       });
     }
-
+    
     // Evento para el formulario de servicios
     document.getElementById("servicio-form").addEventListener("submit", event => {
       event.preventDefault();
       const duracion = calcularDuracion();
       const turnosGenerados = generarTurnos(duracion);
       mostrarTurnos(turnosGenerados);
+    });
+    
+    // ----------------- Firebase Integration -----------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyB98r0hWQe5e6l_-kt_uo6UtnJ8qiQPnjU",
+      authDomain: "lodemicaturnos.firebaseapp.com",
+      projectId: "lodemicaturnos",
+      storageBucket: "lodemicaturnos.firebasestorage.app",
+      messagingSenderId: "211971887324",
+      appId: "1:211971887324:web:eb0844c882be45c7b16419"
+    };
+    
+    const appFirebase = initializeApp(firebaseConfig);
+    const db = getFirestore(appFirebase);
+    
+    async function guardarTurnoPaciente(email, datosTurno) {
+      const pacienteRef = doc(db, "pacientes", email);
+      const pacienteSnap = await getDoc(pacienteRef);
+      if (pacienteSnap.exists()) {
+        await updateDoc(pacienteRef, {
+          historiaClinica: arrayUnion(datosTurno)
+        });
+      } else {
+        await setDoc(pacienteRef, {
+          nombre: datosTurno.nombre,
+          fechaNacimiento: datosTurno.fechaNacimiento,
+          historiaClinica: [datosTurno]
+        });
+      }
+      alert("Reserva registrada exitosamente.");
+    }
+    
+    // Evento para el formulario de reserva del cliente
+    document.getElementById("reserva-form").addEventListener("submit", async event => {
+      event.preventDefault();
+      const nombre = document.getElementById("nombre").value;
+      const email = document.getElementById("email").value;
+      const fechaNacimiento = document.getElementById("fechaNacimiento").value;
+      if (!turnoSeleccionado) {
+        alert("Por favor, selecciona un turno disponible.");
+        return;
+      }
+      const datosTurno = {
+        nombre,
+        fechaNacimiento,
+        fechaAtencion: turnoSeleccionado.fecha,
+        horaTurno: turnoSeleccionado.hora,
+        dia: turnoSeleccionado.dia,
+        servicios: Array.from(document.querySelectorAll("#servicio-container input:checked")).map(cb => cb.dataset.nombre)
+      };
+      try {
+        await guardarTurnoPaciente(email, datosTurno);
+      } catch (error) {
+        console.error("Error al guardar la reserva:", error);
+        alert("Ocurrió un error al guardar la reserva.");
+      }
     });
   </script>
 </body>

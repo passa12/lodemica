@@ -45,6 +45,9 @@
         #admin-container, #login-container {
             display: none;
         }
+        #servicios-container label {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -64,8 +67,8 @@
         <label for="telefono">Teléfono:</label>
         <input type="tel" id="telefono" required>
 
-        <label for="servicio">Selecciona uno o más servicios:</label>
-        <select id="servicio" multiple></select>
+        <label>Selecciona uno o más servicios:</label>
+        <div id="servicios-container"></div>
 
         <button onclick="verTurnosDisponibles()">Ver Turnos Disponibles</button>
         
@@ -111,12 +114,15 @@
         ];
 
         function cargarServicios() {
-            let select = document.getElementById("servicio");
+            let container = document.getElementById("servicios-container");
             servicios.forEach(servicio => {
-                let option = document.createElement("option");
-                option.value = servicio;
-                option.textContent = servicio;
-                select.appendChild(option);
+                let label = document.createElement("label");
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.value = servicio;
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(servicio));
+                container.appendChild(label);
             });
         }
 
@@ -139,6 +145,10 @@
             let horaInicio = document.getElementById("hora_inicio").value;
             let horaFin = document.getElementById("hora_fin").value;
             alert(`Turnos generados para ${fechas} de ${horaInicio} a ${horaFin}`);
+        }
+
+        function verTurnosDisponibles() {
+            document.getElementById("turnos-container").innerText = "Mostrando turnos disponibles...";
         }
 
         document.addEventListener("DOMContentLoaded", cargarServicios);

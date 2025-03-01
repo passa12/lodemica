@@ -42,6 +42,9 @@
             display: block;
             margin: 0 auto 20px;
         }
+        #admin-container {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -62,12 +65,32 @@
         <input type="tel" id="telefono" required>
 
         <label for="servicio">Selecciona un servicio:</label>
-        <select id="servicio">
-        </select>
+        <select id="servicio"></select>
 
         <button onclick="verTurnosDisponibles()">Ver Turnos Disponibles</button>
         
         <div id="turnos-container"></div>
+    </div>
+
+    <div class="container" id="login-container">
+        <h2>Acceso Administrativo</h2>
+        <label for="admin-password">Contraseña:</label>
+        <input type="password" id="admin-password">
+        <button onclick="validarLogin()">Ingresar</button>
+    </div>
+
+    <div class="container" id="admin-container">
+        <h2>Administración de Turnos</h2>
+        <label for="fecha_trabajo">Seleccionar Fecha de Trabajo:</label>
+        <input type="date" id="fecha_trabajo">
+
+        <label for="hora_inicio">Hora de Inicio:</label>
+        <input type="time" id="hora_inicio">
+
+        <label for="hora_fin">Hora de Fin:</label>
+        <input type="time" id="hora_fin">
+
+        <button onclick="generarTurnos()">Generar Turnos</button>
     </div>
 
     <script>
@@ -85,6 +108,10 @@
             "ESPALDA BAJA", "ESPALDA COMPLETA"
         ];
 
+        const servicios40min = ["ELLOS: CUERPO COMPLETO", "ELLAS: CUERPO COMPLETO"];
+        
+        let turnosDisponibles = [];
+
         function cargarServicios() {
             let select = document.getElementById("servicio");
             servicios.forEach(servicio => {
@@ -96,7 +123,52 @@
         }
 
         function verTurnosDisponibles() {
-            document.getElementById("turnos-container").innerHTML = "<p>Aquí aparecerán los turnos disponibles.</p>";
+            let contenedor = document.getElementById("turnos-container");
+            contenedor.innerHTML = "<h3>Turnos Disponibles</h3>";
+            if (turnosDisponibles.length === 0) {
+                contenedor.innerHTML += "<p>No hay turnos disponibles.</p>";
+                return;
+            }
+            turnosDisponibles.forEach(turno => {
+                let boton = document.createElement("button");
+                boton.textContent = turno;
+                boton.onclick = () => alert("Has seleccionado el turno: " + turno);
+                contenedor.appendChild(boton);
+            });
+        }
+
+        function generarTurnos() {
+            let fecha = document.getElementById("fecha_trabajo").value;
+            let inicio = document.getElementById("hora_inicio").value;
+            let fin = document.getElementById("hora_fin").value;
+
+            if (!fecha || !inicio || !fin) {
+                alert("Por favor, completa todos los campos.");
+                return;
+            }
+
+            let inicioHora = new Date(`2023-01-01T${inicio}:00`);
+            let finHora = new Date(`2023-01-01T${fin}:00`);
+
+            turnosDisponibles = [];
+            while (inicioHora < finHora) {
+                let turno = `${fecha} - ${inicioHora.getHours().toString().padStart(2, '0')}:${inicioHora.getMinutes().toString().padStart(2, '0')}`;
+                turnosDisponibles.push(turno);
+                let duracion = servicios40min.includes(document.getElementById("servicio").value) ? 40 : 20;
+                inicioHora.setMinutes(inicioHora.getMinutes() + duracion);
+            }
+
+            alert("Turnos generados correctamente.");
+        }
+
+        function validarLogin() {
+            let password = document.getElementById("admin-password").value;
+            if (password === "admin123") {
+                document.getElementById("admin-container").style.display = "block";
+                document.getElementById("login-container").style.display = "none";
+            } else {
+                alert("Contraseña incorrecta");
+            }
         }
 
         document.addEventListener("DOMContentLoaded", cargarServicios);

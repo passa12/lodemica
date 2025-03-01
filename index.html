@@ -37,13 +37,26 @@
         button:hover {
             background-color: #e60073;
         }
+        .logo {
+            max-width: 150px;
+            display: block;
+            margin: 0 auto 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <img src="logo.png" alt="Logo" class="logo">
         <h2>Reserva de Turnos</h2>
+        
         <label for="nombre">Nombre:</label>
         <input type="text" id="nombre" required>
+
+        <label for="correo">Correo Electrónico:</label>
+        <input type="email" id="correo" required>
+
+        <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+        <input type="date" id="fecha_nacimiento" required>
 
         <label for="telefono">Teléfono:</label>
         <input type="tel" id="telefono" required>

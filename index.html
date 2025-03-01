@@ -45,6 +45,9 @@
         #admin-container {
             display: none;
         }
+        #admin-panel {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -79,10 +82,12 @@
         <button onclick="validarLogin()">Ingresar</button>
     </div>
 
-    <div class="container" id="admin-container">
+    <button onclick="toggleAdmin()">Administración</button>
+    
+    <div class="container" id="admin-panel">
         <h2>Administración de Turnos</h2>
-        <label for="fecha_trabajo">Seleccionar Fecha de Trabajo:</label>
-        <input type="date" id="fecha_trabajo">
+        <label for="fechas_trabajo">Seleccionar Fechas de Trabajo:</label>
+        <input type="date" id="fechas_trabajo" multiple>
 
         <label for="hora_inicio">Hora de Inicio:</label>
         <input type="time" id="hora_inicio">
@@ -138,7 +143,7 @@
         }
 
         function generarTurnos() {
-            let fecha = document.getElementById("fecha_trabajo").value;
+            let fecha = document.getElementById("fechas_trabajo").value;
             let inicio = document.getElementById("hora_inicio").value;
             let fin = document.getElementById("hora_fin").value;
 
@@ -164,11 +169,16 @@
         function validarLogin() {
             let password = document.getElementById("admin-password").value;
             if (password === "admin123") {
-                document.getElementById("admin-container").style.display = "block";
+                document.getElementById("admin-panel").style.display = "block";
                 document.getElementById("login-container").style.display = "none";
             } else {
                 alert("Contraseña incorrecta");
             }
+        }
+
+        function toggleAdmin() {
+            let panel = document.getElementById("admin-panel");
+            panel.style.display = panel.style.display === "none" ? "block" : "none";
         }
 
         document.addEventListener("DOMContentLoaded", cargarServicios);

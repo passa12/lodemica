@@ -83,8 +83,8 @@
 
     <div class="container" id="admin-container">
         <h2>Administración de Turnos</h2>
-        <label for="fecha_trabajo">Seleccionar Fechas de Trabajo:</label>
-        <input type="text" id="fecha_trabajo" placeholder="Ej: 2024-03-07,2024-03-08" required>
+        <label for="fechas_trabajo">Seleccionar Fechas de Trabajo:</label>
+        <input type="date" id="fechas_trabajo" multiple>
 
         <label for="hora_inicio">Hora de Inicio:</label>
         <input type="time" id="hora_inicio">
@@ -116,7 +116,6 @@
                 let option = document.createElement("option");
                 option.value = servicio;
                 option.textContent = servicio;
-                option.onclick = () => option.selected = !option.selected;
                 select.appendChild(option);
             });
         }
@@ -136,10 +135,10 @@
         }
 
         function generarTurnos() {
-            let fechas = document.getElementById("fecha_trabajo").value.split(',');
+            let fechas = document.getElementById("fechas_trabajo").value;
             let horaInicio = document.getElementById("hora_inicio").value;
             let horaFin = document.getElementById("hora_fin").value;
-            alert(`Turnos generados para ${fechas.join(', ')} de ${horaInicio} a ${horaFin}`);
+            alert(`Turnos generados para ${fechas} de ${horaInicio} a ${horaFin}`);
         }
 
         document.addEventListener("DOMContentLoaded", cargarServicios);

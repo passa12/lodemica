@@ -42,12 +42,6 @@
             display: block;
             margin: 0 auto 20px;
         }
-        #admin-container, #login-container {
-            display: none;
-        }
-        #servicios-container label {
-            display: block;
-        }
     </style>
 </head>
 <body>
@@ -67,35 +61,13 @@
         <label for="telefono">Teléfono:</label>
         <input type="tel" id="telefono" required>
 
-        <label>Selecciona uno o más servicios (mantén Ctrl para seleccionar varios):</label>
-        <select id="servicios" multiple></select>
+        <label for="servicio">Selecciona un servicio:</label>
+        <select id="servicio">
+        </select>
 
         <button onclick="verTurnosDisponibles()">Ver Turnos Disponibles</button>
         
         <div id="turnos-container"></div>
-    </div>
-
-    <button onclick="mostrarLogin()">Administrar Turnos</button>
-    
-    <div class="container" id="login-container">
-        <h2>Acceso Administrativo</h2>
-        <label for="admin-password">Contraseña:</label>
-        <input type="password" id="admin-password">
-        <button onclick="validarLogin()">Ingresar</button>
-    </div>
-
-    <div class="container" id="admin-container">
-        <h2>Administración de Turnos</h2>
-        <label for="fechas_trabajo">Seleccionar Fechas de Trabajo:</label>
-        <input type="date" id="fechas_trabajo" multiple>
-
-        <label for="hora_inicio">Hora de Inicio:</label>
-        <input type="time" id="hora_inicio">
-
-        <label for="hora_fin">Hora de Fin:</label>
-        <input type="time" id="hora_fin">
-
-        <button onclick="generarTurnos()">Generar Turnos</button>
     </div>
 
     <script>
@@ -114,7 +86,7 @@
         ];
 
         function cargarServicios() {
-            let select = document.getElementById("servicios");
+            let select = document.getElementById("servicio");
             servicios.forEach(servicio => {
                 let option = document.createElement("option");
                 option.value = servicio;
@@ -123,29 +95,8 @@
             });
         }
 
-        function mostrarLogin() {
-            document.getElementById("login-container").style.display = "block";
-        }
-
-        function validarLogin() {
-            let password = document.getElementById("admin-password").value;
-            if (password === "admin123") {
-                document.getElementById("admin-container").style.display = "block";
-                document.getElementById("login-container").style.display = "none";
-            } else {
-                alert("Contraseña incorrecta");
-            }
-        }
-
-        function generarTurnos() {
-            let fechas = document.getElementById("fechas_trabajo").value;
-            let horaInicio = document.getElementById("hora_inicio").value;
-            let horaFin = document.getElementById("hora_fin").value;
-            alert(`Turnos generados para ${fechas} de ${horaInicio} a ${horaFin}`);
-        }
-
         function verTurnosDisponibles() {
-            document.getElementById("turnos-container").innerText = "Mostrando turnos disponibles...";
+            document.getElementById("turnos-container").innerHTML = "<p>Aquí aparecerán los turnos disponibles.</p>";
         }
 
         document.addEventListener("DOMContentLoaded", cargarServicios);

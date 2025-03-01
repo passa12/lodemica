@@ -67,8 +67,8 @@
         <label for="telefono">Teléfono:</label>
         <input type="tel" id="telefono" required>
 
-        <label>Selecciona uno o más servicios:</label>
-        <div id="servicios-container"></div>
+        <label>Selecciona uno o más servicios (mantén Ctrl para seleccionar varios):</label>
+        <select id="servicios" multiple></select>
 
         <button onclick="verTurnosDisponibles()">Ver Turnos Disponibles</button>
         
@@ -114,15 +114,12 @@
         ];
 
         function cargarServicios() {
-            let container = document.getElementById("servicios-container");
+            let select = document.getElementById("servicios");
             servicios.forEach(servicio => {
-                let label = document.createElement("label");
-                let checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.value = servicio;
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(servicio));
-                container.appendChild(label);
+                let option = document.createElement("option");
+                option.value = servicio;
+                option.textContent = servicio;
+                select.appendChild(option);
             });
         }
 
